@@ -76,7 +76,7 @@ func (bs *BankingService) CreateAccount(accountNo, name string, initialBalance f
 
 	// Validate initial balance
 	if initialBalance < 100 {
-		return nil, fmt.Errorf("initial balance must be at least $100")
+		return nil, fmt.Errorf("initial balance must be at least ₱100")
 	}
 
 	account := &Account{
@@ -333,7 +333,7 @@ func depositHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": fmt.Sprintf("Deposited $%.2f successfully", req.Amount),
+		"message": fmt.Sprintf("Deposited ₱%.2f successfully", req.Amount),
 		"account": account,
 	})
 }
@@ -358,7 +358,7 @@ func withdrawHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": fmt.Sprintf("Withdrew $%.2f successfully", req.Amount),
+		"message": fmt.Sprintf("Withdrew ₱%.2f successfully", req.Amount),
 		"account": account,
 	})
 }

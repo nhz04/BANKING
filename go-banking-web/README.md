@@ -79,7 +79,8 @@ A modern, interactive web-based banking system built with Go and featuring a stu
 
 3. **Run the application:**
    ```powershell
-   go run main.go
+   go run main.go 
+   cd go-banking-web; .\banking-web.exe
    ```
 
 4. **Open your browser and visit:**

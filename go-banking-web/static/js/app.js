@@ -157,7 +157,7 @@ function renderAccounts() {
                     <small>Created: ${formatDate(account.created_at)}</small>
                 </div>
                 <div class="account-balance">
-                    <div class="balance-amount">$${formatCurrency(account.balance)}</div>
+                    <div class="balance-amount">₱${formatCurrency(account.balance)}</div>
                     <div class="balance-label">Current Balance</div>
                 </div>
             </div>
@@ -266,7 +266,7 @@ async function handleCheckBalance(e) {
         
         document.getElementById('balance-result').innerHTML = `
             <h3>Account Balance</h3>
-            <div class="amount">$${formatCurrency(account.balance)}</div>
+            <div class="amount">₱${formatCurrency(account.balance)}</div>
             <div class="account-details">
                 ${account.name} • Account #${account.account_no}
             </div>
@@ -331,8 +331,8 @@ function renderTransactions() {
                                 ${transaction.type}
                             </span>
                         </td>
-                        <td>$${formatCurrency(transaction.amount)}</td>
-                        <td>$${formatCurrency(transaction.balance)}</td>
+                        <td>₱${formatCurrency(transaction.amount)}</td>
+                        <td>₱${formatCurrency(transaction.balance)}</td>
                         <td><small>${transaction.id.substring(0, 8)}...</small></td>
                     </tr>
                 `).join('')}
@@ -358,13 +358,13 @@ function updateDashboardStats() {
     const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
     
     document.getElementById('total-accounts').textContent = totalAccounts;
-    document.getElementById('total-balance').textContent = `$${formatCurrency(totalBalance)}`;
+    document.getElementById('total-balance').textContent = `₱${formatCurrency(totalBalance)}`;
     
     // For now, we'll calculate deposits and withdrawals based on initial balances
     // In a real app, you'd track these separately
     const totalDeposits = accounts.reduce((sum, account) => sum + account.balance, 0);
-    document.getElementById('total-deposits').textContent = `$${formatCurrency(totalDeposits)}`;
-    document.getElementById('total-withdrawals').textContent = '$0.00';
+    document.getElementById('total-deposits').textContent = `₱${formatCurrency(totalDeposits)}`;
+    document.getElementById('total-withdrawals').textContent = '₱0.00';
 }
 
 // Modal Functions
