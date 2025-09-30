@@ -808,7 +808,8 @@ body {
 .transaction-controls .form-input {
     flex: 1;
     max-width: 300px;
-    height: auto;
+    height: 3.5 rem;
+    margin-top: 1rem;
 }
 
 .transaction-controls .btn {
