@@ -391,6 +391,18 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    transition: font-size 0.3s ease;
+}
+
+/* Responsive font sizing for large numbers */
+.stat-content h3.large-number {
+    font-size: 2rem;
+}
+
+.stat-content h3.very-large-number {
+    font-size: 1.75rem;
 }
 
 .stat-content p {
@@ -614,6 +626,71 @@ body {
     font-weight: 700;
     color: #c53030;
     margin-bottom: 0.25rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    transition: font-size 0.3s ease;
+}
+
+/* Responsive font sizing for account balances */
+.balance-amount.large-number {
+    font-size: 1.5rem;
+}
+
+.balance-amount.very-large-number {
+    font-size: 1.3rem;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .stat-content h3 {
+        font-size: 2rem;
+    }
+    
+    .stat-content h3.large-number {
+        font-size: 1.5rem;
+    }
+    
+    .stat-content h3.very-large-number {
+        font-size: 1.3rem;
+    }
+    
+    .balance-amount {
+        font-size: 1.5rem;
+    }
+    
+    .balance-amount.large-number {
+        font-size: 1.3rem;
+    }
+    
+    .balance-amount.very-large-number {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-content h3 {
+        font-size: 1.5rem;
+    }
+    
+    .stat-content h3.large-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-content h3.very-large-number {
+        font-size: 1.1rem;
+    }
+    
+    .balance-amount {
+        font-size: 1.3rem;
+    }
+    
+    .balance-amount.large-number {
+        font-size: 1.1rem;
+    }
+    
+    .balance-amount.very-large-number {
+        font-size: 1rem;
+    }
 }
 
 .balance-label {

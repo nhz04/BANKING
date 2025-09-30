@@ -216,7 +216,7 @@ function renderAccounts() {
                     <small>Created: ${formatDate(account.created_at)}</small>
                 </div>
                 <div class="account-balance">
-                    <div class="balance-amount">₱${formatCurrency(account.balance)}</div>
+                    <div class="balance-amount" data-balance="${account.balance}">₱${formatLargeNumber(account.balance, true)}</div>
                     <div class="balance-label">Current Balance</div>
                 </div>
             </div>
@@ -236,6 +236,14 @@ function renderAccounts() {
             </div>
         </div>
     `).join('');
+    
+    // Apply responsive classes to balance amounts
+    accounts.forEach(account => {
+        const balanceElement = document.querySelector(`[data-balance="${account.balance}"]`);
+        if (balanceElement) {
+            addResponsiveClass(balanceElement, account.balance);
+        }
+    });
 }
 
 async function handleCreateAccount(e) {
@@ -340,7 +348,7 @@ async function handleCheckBalance(e) {
         
         document.getElementById('balance-result').innerHTML = `
             <h3>Account Balance</h3>
-            <div class="amount">₱${formatCurrency(account.balance)}</div>
+            <div class="amount">₱${formatLargeNumber(account.balance, true)}</div>
             <div class="account-details">
                 ${account.name} • Account #${account.account_no}
             </div>
@@ -405,8 +413,8 @@ function renderTransactions() {
                                 ${transaction.type}
                             </span>
                         </td>
-                        <td>₱${formatCurrency(transaction.amount)}</td>
-                        <td>₱${formatCurrency(transaction.balance)}</td>
+                        <td>₱${formatLargeNumber(transaction.amount, true)}</td>
+                        <td>₱${formatLargeNumber(transaction.balance, true)}</td>
                         <td><small>${transaction.id.substring(0, 8)}...</small></td>
                     </tr>
                 `).join('')}
@@ -443,9 +451,11 @@ async function updateDashboardStats() {
     
     if (accountsElement) {
         accountsElement.textContent = totalAccounts.toString();
+        addResponsiveClass(accountsElement, totalAccounts);
     }
     if (balanceElement) {
-        balanceElement.textContent = '₱' + formatCurrency(totalBalance);
+        balanceElement.textContent = formatSmartCurrency(totalBalance);
+        addResponsiveClass(balanceElement, totalBalance);
     }
     
     // Calculate deposits and withdrawals from all transactions
@@ -497,10 +507,12 @@ async function calculateTotalTransactions() {
         const withdrawalsElement = document.getElementById('total-withdrawals');
         
         if (depositsElement) {
-            depositsElement.textContent = '₱' + formatCurrency(totalDeposits);
+            depositsElement.textContent = formatSmartCurrency(totalDeposits);
+            addResponsiveClass(depositsElement, totalDeposits);
         }
         if (withdrawalsElement) {
-            withdrawalsElement.textContent = '₱' + formatCurrency(totalWithdrawals);
+            withdrawalsElement.textContent = formatSmartCurrency(totalWithdrawals);
+            addResponsiveClass(withdrawalsElement, totalWithdrawals);
         }
         
     } catch (error) {
@@ -511,9 +523,11 @@ async function calculateTotalTransactions() {
         
         if (depositsElement) {
             depositsElement.textContent = '₱0.00';
+            addResponsiveClass(depositsElement, 0);
         }
         if (withdrawalsElement) {
             withdrawalsElement.textContent = '₱0.00';
+            addResponsiveClass(withdrawalsElement, 0);
         }
     }
 }
@@ -665,6 +679,50 @@ function hideLoading() {
 // Utility Functions
 function formatCurrency(amount) {
     return amount.toFixed(2);
+}
+
+function formatLargeNumber(amount, showFullPrecision = false) {
+    const num = Math.abs(amount);
+    
+    // For very large numbers, use compact notation
+    if (num >= 1000000000) {
+        return (amount / 1000000000).toFixed(1) + 'B';
+    } else if (num >= 1000000) {
+        return (amount / 1000000).toFixed(1) + 'M';
+    } else if (num >= 10000) {
+        return (amount / 1000).toFixed(1) + 'K';
+    } else if (showFullPrecision) {
+        return formatCurrency(amount);
+    } else {
+        return Math.round(amount).toLocaleString();
+    }
+}
+
+function formatSmartCurrency(amount, prefix = '₱') {
+    const num = Math.abs(amount);
+    
+    // Determine if we should use compact notation based on number size
+    if (num >= 10000) {
+        return prefix + formatLargeNumber(amount, false);
+    } else {
+        return prefix + formatCurrency(amount);
+    }
+}
+
+function addResponsiveClass(element, amount) {
+    if (!element) return;
+    
+    // Remove existing classes
+    element.classList.remove('large-number', 'very-large-number');
+    
+    const num = Math.abs(amount);
+    
+    // Add appropriate class based on number size
+    if (num >= 1000000) {
+        element.classList.add('very-large-number');
+    } else if (num >= 10000) {
+        element.classList.add('large-number');
+    }
 }
 
 function formatDate(dateString) {
