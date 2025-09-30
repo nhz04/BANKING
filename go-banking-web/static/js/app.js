@@ -182,10 +182,11 @@ async function loadAccounts() {
     try {
         const response = await apiCall('/api/v1/accounts');
         accounts = response.accounts || [];
+        console.log('Loaded accounts:', accounts.length);
         renderAccounts();
-        updateDashboardStats();
     } catch (error) {
         showToast('Failed to load accounts', 'error');
+        console.error('Error loading accounts:', error);
     }
 }
 
@@ -256,7 +257,14 @@ async function handleCreateAccount(e) {
 
         showToast(response.message, 'success');
         closeModal('create-account-modal');
-        loadAccounts();
+        await loadAccounts();
+        await updateDashboardStats(); // Update dashboard stats after creating account
+        
+        // If we're on the dashboard, force a refresh
+        if (currentSection === 'dashboard') {
+            showSection('dashboard');
+        }
+        
         document.getElementById('create-account-form').reset();
     } catch (error) {
         showToast(error.message, 'error');
@@ -274,7 +282,8 @@ async function deleteAccount(accountNo) {
         });
 
         showToast(response.message, 'success');
-        loadAccounts();
+        await loadAccounts();
+        await updateDashboardStats(); // Update dashboard stats after deleting account
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -296,7 +305,14 @@ async function handleTransaction(e) {
 
         showToast(response.message, 'success');
         closeModal('transaction-modal');
-        loadAccounts();
+        await loadAccounts();
+        await updateDashboardStats(); // Update dashboard stats after transaction
+        
+        // If we're on the dashboard, force a refresh
+        if (currentSection === 'dashboard') {
+            showSection('dashboard');
+        }
+        
         document.getElementById('transaction-form').reset();
     } catch (error) {
         showToast(error.message, 'error');
@@ -407,20 +423,33 @@ function viewTransactions(accountNo) {
 
 // Dashboard
 async function loadDashboardData() {
+    console.log('Loading dashboard data...');
     await loadAccounts();
-    updateDashboardStats();
+    await updateDashboardStats();
+    console.log('Dashboard data loaded successfully');
 }
 
-function updateDashboardStats() {
+async function updateDashboardStats() {
+    console.log('Updating dashboard stats with', accounts.length, 'accounts');
+    
     const totalAccounts = accounts.length;
     const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
     
-    // Animate counter updates
-    animateCounterUpdate(document.getElementById('total-accounts'), totalAccounts, '', '');
-    animateCounterUpdate(document.getElementById('total-balance'), totalBalance, '₱', '');
+    console.log('Total accounts:', totalAccounts, 'Total balance:', totalBalance);
+    
+    // Update account and balance stats immediately
+    const accountsElement = document.getElementById('total-accounts');
+    const balanceElement = document.getElementById('total-balance');
+    
+    if (accountsElement) {
+        accountsElement.textContent = totalAccounts.toString();
+    }
+    if (balanceElement) {
+        balanceElement.textContent = '₱' + formatCurrency(totalBalance);
+    }
     
     // Calculate deposits and withdrawals from all transactions
-    calculateTotalTransactions();
+    await calculateTotalTransactions();
 }
 
 // Calculate total deposits and withdrawals across all accounts
@@ -463,15 +492,29 @@ async function calculateTotalTransactions() {
         
         console.log(`Final totals - Deposits: ₱${totalDeposits}, Withdrawals: ₱${totalWithdrawals}`);
         
-        // Update the UI with calculated totals
-        animateCounterUpdate(document.getElementById('total-deposits'), totalDeposits, '₱', '');
-        animateCounterUpdate(document.getElementById('total-withdrawals'), totalWithdrawals, '₱', '');
+        // Update the UI with calculated totals immediately
+        const depositsElement = document.getElementById('total-deposits');
+        const withdrawalsElement = document.getElementById('total-withdrawals');
+        
+        if (depositsElement) {
+            depositsElement.textContent = '₱' + formatCurrency(totalDeposits);
+        }
+        if (withdrawalsElement) {
+            withdrawalsElement.textContent = '₱' + formatCurrency(totalWithdrawals);
+        }
         
     } catch (error) {
         console.error('Error calculating total transactions:', error);
         // Fallback to showing 0 for both
-        animateCounterUpdate(document.getElementById('total-deposits'), 0, '₱', '');
-        animateCounterUpdate(document.getElementById('total-withdrawals'), 0, '₱', '');
+        const depositsElement = document.getElementById('total-deposits');
+        const withdrawalsElement = document.getElementById('total-withdrawals');
+        
+        if (depositsElement) {
+            depositsElement.textContent = '₱0.00';
+        }
+        if (withdrawalsElement) {
+            withdrawalsElement.textContent = '₱0.00';
+        }
     }
 }
 
