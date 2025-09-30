@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <link rel="icon" type="image/png" href="/static/bank_icon.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="/static/bank_icon.png" alt="Bank Icon">
+                <span>404 Finance</span>
+            </div>
+            <nav class="nav">
+                <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-chart-pie"></i>
+                    Dashboard
+                </a>
+                <a href="#accounts" class="nav-link" data-section="accounts">
+                    <i class="fas fa-user-circle"></i>
+                    Accounts
+                </a>
+                <a href="#transactions" class="nav-link" data-section="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    Transactions
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="section active">
+                <div class="section-header">
+                    <h1><i class="fas fa-chart-pie"></i> Dashboard</h1>
+                    <p>Welcome to 404 Finance - Your money, your way</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-accounts">0</h3>
+                            <p>Total Accounts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-balance">$0.00</h3>
+                            <p>Total Balance</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-deposits">$0.00</h3>
+                            <p>Total Deposits</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-withdrawals">$0.00</h3>
+                            <p>Total Withdrawals</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                    <div class="action-buttons">
+                        <button class="action-btn create-account-btn" onclick="showCreateAccountModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Account
+                        </button>
+                        <button class="action-btn deposit-btn" onclick="showTransactionModal('deposit')">
+                            <i class="fas fa-arrow-up"></i>
+                            Make Deposit
+                        </button>
+                        <button class="action-btn withdraw-btn" onclick="showTransactionModal('withdraw')">
+                            <i class="fas fa-arrow-down"></i>
+                            Make Withdrawal
+                        </button>
+                        <button class="action-btn balance-btn" onclick="showBalanceModal()">
+                            <i class="fas fa-eye"></i>
+                            Check Balance
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Accounts Section -->
+            <section id="accounts-section" class="section">
+                <div class="section-header">
+                    <h1><i class="fas fa-user-circle"></i> Account Management</h1>
+                    <button class="btn btn-primary" onclick="showCreateAccountModal()">
+                        <i class="fas fa-plus"></i> Create New Account
+                    </button>
+                </div>
+
+                <div class="accounts-grid" id="accounts-grid">
+                    <!-- Accounts will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Transactions Section -->
+            <section id="transactions-section" class="section">
+                <div class="section-header">
+                    <h1><i class="fas fa-exchange-alt"></i> Transaction Management</h1>
+                    <div class="transaction-controls">
+                        <input type="text" id="transaction-account" placeholder="Enter account number" class="form-input">
+                        <button class="btn btn-primary" onclick="loadTransactions()">
+                            <i class="fas fa-search"></i> Load Transactions
+                        </button>
+                    </div>
+                </div>
+
+                <div class="transactions-container" id="transactions-container">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Create Account Modal -->
+    <div id="create-account-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus"></i> Create New Account</h2>
+                <button class="modal-close" onclick="closeModal('create-account-modal')">&times;</button>
+            </div>
+            <form id="create-account-form">
+                <div class="form-group">
+                    <label for="account-no">Account Number (6 digits)</label>
+                    <input type="text" id="account-no" maxlength="6" pattern="[0-9]{6}" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="account-name">Account Holder Name</label>
+                    <input type="text" id="account-name" pattern="[a-zA-Z\s]+" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="initial-balance">Initial Balance ($)</label>
+                    <input type="number" id="initial-balance" min="100" step="0.01" required class="form-input">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('create-account-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transaction-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="transaction-modal-title"><i class="fas fa-exchange-alt"></i> Transaction</h2>
+                <button class="modal-close" onclick="closeModal('transaction-modal')">&times;</button>
+            </div>
+            <form id="transaction-form">
+                <div class="form-group">
+                    <label for="trans-account-no">Account Number</label>
+                    <input type="text" id="trans-account-no" maxlength="6" pattern="[0-9]{6}" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="trans-amount">Amount ($)</label>
+                    <input type="number" id="trans-amount" min="0.01" step="0.01" required class="form-input">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('transaction-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="transaction-submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Balance Modal -->
+    <div id="balance-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-eye"></i> Check Balance</h2>
+                <button class="modal-close" onclick="closeModal('balance-modal')">&times;</button>
+            </div>
+            <form id="balance-form">
+                <div class="form-group">
+                    <label for="balance-account-no">Account Number</label>
+                    <input type="text" id="balance-account-no" maxlength="6" pattern="[0-9]{6}" required class="form-input">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('balance-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Check Balance</button>
+                </div>
+            </form>
+            <div id="balance-result" class="balance-result" style="display: none;">
+                <!-- Balance result will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <div class="toast-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="toast-message"></div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
