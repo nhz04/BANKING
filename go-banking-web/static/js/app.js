@@ -13,7 +13,65 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     loadDashboardData();
     setupEventListeners();
+    addInteractiveAnimations();
 });
+
+// Add interactive animations
+function addInteractiveAnimations() {
+    // Add floating animation to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in-up');
+    });
+
+    // Add staggered animations to action buttons
+    const actionButtons = document.querySelectorAll('.action-btn');
+    actionButtons.forEach((btn, index) => {
+        btn.style.animationDelay = `${0.3 + index * 0.1}s`;
+        btn.classList.add('fade-in-up');
+    });
+
+    // Add counter animation to stats
+    animateCounters();
+}
+
+// Animate counter numbers
+function animateCounters() {
+    const counters = [
+        { element: document.getElementById('total-accounts'), target: 0, prefix: '', suffix: '' },
+        { element: document.getElementById('total-balance'), target: 0, prefix: '₱', suffix: '' },
+        { element: document.getElementById('total-deposits'), target: 0, prefix: '₱', suffix: '' },
+        { element: document.getElementById('total-withdrawals'), target: 0, prefix: '₱', suffix: '' }
+    ];
+
+    counters.forEach(counter => {
+        if (counter.element) {
+            animateCounter(counter.element, counter.target, counter.prefix, counter.suffix);
+        }
+    });
+}
+
+function animateCounter(element, target, prefix = '', suffix = '') {
+    const duration = 2000;
+    const start = 0;
+    const increment = target / (duration / 16);
+    let current = start;
+
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        
+        if (prefix === '₱') {
+            element.textContent = `${prefix}${current.toFixed(2)}`;
+        } else {
+            element.textContent = `${prefix}${Math.floor(current)}${suffix}`;
+        }
+    }, 16);
+}
 
 // Initialize Application
 function initializeApp() {
@@ -357,14 +415,38 @@ function updateDashboardStats() {
     const totalAccounts = accounts.length;
     const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
     
-    document.getElementById('total-accounts').textContent = totalAccounts;
-    document.getElementById('total-balance').textContent = `₱${formatCurrency(totalBalance)}`;
+    // Animate counter updates
+    animateCounterUpdate(document.getElementById('total-accounts'), totalAccounts, '', '');
+    animateCounterUpdate(document.getElementById('total-balance'), totalBalance, '₱', '');
     
     // For now, we'll calculate deposits and withdrawals based on initial balances
     // In a real app, you'd track these separately
     const totalDeposits = accounts.reduce((sum, account) => sum + account.balance, 0);
-    document.getElementById('total-deposits').textContent = `₱${formatCurrency(totalDeposits)}`;
-    document.getElementById('total-withdrawals').textContent = '₱0.00';
+    animateCounterUpdate(document.getElementById('total-deposits'), totalDeposits, '₱', '');
+    animateCounterUpdate(document.getElementById('total-withdrawals'), 0, '₱', '');
+}
+
+function animateCounterUpdate(element, newTarget, prefix = '', suffix = '') {
+    const currentText = element.textContent.replace(/[₱,]/g, '');
+    const currentValue = parseFloat(currentText) || 0;
+    const target = newTarget;
+    const duration = 1000;
+    const increment = (target - currentValue) / (duration / 16);
+    let current = currentValue;
+
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
+            current = target;
+            clearInterval(timer);
+        }
+        
+        if (prefix === '₱') {
+            element.textContent = `${prefix}${current.toFixed(2)}`;
+        } else {
+            element.textContent = `${prefix}${Math.floor(current)}${suffix}`;
+        }
+    }, 16);
 }
 
 // Modal Functions
@@ -543,11 +625,82 @@ document.addEventListener('keydown', function(e) {
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
         const btn = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+        
+        // Add ripple effect
+        const ripple = document.createElement('span');
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple-effect');
+        
+        btn.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+        
+        // Button press animation
         btn.style.transform = 'scale(0.95)';
         setTimeout(() => {
             btn.style.transform = '';
         }, 150);
     }
+});
+
+// Enhanced card interactions
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.stat-card')) {
+        const card = e.target.closest('.stat-card');
+        card.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            card.style.transform = '';
+        }, 200);
+        
+        // Add floating class for continuous animation
+        card.classList.add('floating');
+        setTimeout(() => {
+            card.classList.remove('floating');
+        }, 3000);
+    }
+});
+
+// Add parallax effect to background shapes
+document.addEventListener('mousemove', function(e) {
+    const shapes = document.querySelectorAll('.shape');
+    const mouseX = e.clientX / window.innerWidth;
+    const mouseY = e.clientY / window.innerHeight;
+    
+    shapes.forEach((shape, index) => {
+        const speed = (index + 1) * 0.5;
+        const x = (mouseX - 0.5) * speed * 20;
+        const y = (mouseY - 0.5) * speed * 20;
+        
+        shape.style.transform = `translate(${x}px, ${y}px) scale(${1 + mouseX * 0.1})`;
+    });
+});
+
+// Add scroll animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in-up');
+        }
+    });
+}, observerOptions);
+
+// Observe elements for scroll animations
+document.querySelectorAll('.stat-card, .action-btn, .account-card').forEach(el => {
+    observer.observe(el);
 });
 
 // Add ripple effect to cards
