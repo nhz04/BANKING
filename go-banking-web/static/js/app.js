@@ -419,11 +419,60 @@ function updateDashboardStats() {
     animateCounterUpdate(document.getElementById('total-accounts'), totalAccounts, '', '');
     animateCounterUpdate(document.getElementById('total-balance'), totalBalance, '₱', '');
     
-    // For now, we'll calculate deposits and withdrawals based on initial balances
-    // In a real app, you'd track these separately
-    const totalDeposits = accounts.reduce((sum, account) => sum + account.balance, 0);
-    animateCounterUpdate(document.getElementById('total-deposits'), totalDeposits, '₱', '');
-    animateCounterUpdate(document.getElementById('total-withdrawals'), 0, '₱', '');
+    // Calculate deposits and withdrawals from all transactions
+    calculateTotalTransactions();
+}
+
+// Calculate total deposits and withdrawals across all accounts
+async function calculateTotalTransactions() {
+    let totalDeposits = 0;
+    let totalWithdrawals = 0;
+    
+    console.log('Starting to calculate total transactions for', accounts.length, 'accounts');
+    
+    try {
+        // Get transactions for each account
+        for (const account of accounts) {
+            console.log(`Loading transactions for account ${account.account_no}`);
+            try {
+                const response = await fetch(`/api/v1/accounts/${account.account_no}/transactions`);
+                if (!response.ok) {
+                    console.warn(`Failed to fetch transactions for ${account.account_no}: ${response.status}`);
+                    continue;
+                }
+                
+                const data = await response.json();
+                const accountTransactions = data.transactions || [];
+                
+                console.log(`Found ${accountTransactions.length} transactions for account ${account.account_no}`);
+                
+                // Calculate deposits and withdrawals for this account
+                accountTransactions.forEach(transaction => {
+                    if (transaction.type === 'deposit') {
+                        totalDeposits += transaction.amount;
+                        console.log(`Added deposit: ₱${transaction.amount}, Total deposits now: ₱${totalDeposits}`);
+                    } else if (transaction.type === 'withdraw') {
+                        totalWithdrawals += transaction.amount;
+                        console.log(`Added withdrawal: ₱${transaction.amount}, Total withdrawals now: ₱${totalWithdrawals}`);
+                    }
+                });
+            } catch (error) {
+                console.warn(`Failed to load transactions for account ${account.account_no}:`, error);
+            }
+        }
+        
+        console.log(`Final totals - Deposits: ₱${totalDeposits}, Withdrawals: ₱${totalWithdrawals}`);
+        
+        // Update the UI with calculated totals
+        animateCounterUpdate(document.getElementById('total-deposits'), totalDeposits, '₱', '');
+        animateCounterUpdate(document.getElementById('total-withdrawals'), totalWithdrawals, '₱', '');
+        
+    } catch (error) {
+        console.error('Error calculating total transactions:', error);
+        // Fallback to showing 0 for both
+        animateCounterUpdate(document.getElementById('total-deposits'), 0, '₱', '');
+        animateCounterUpdate(document.getElementById('total-withdrawals'), 0, '₱', '');
+    }
 }
 
 function animateCounterUpdate(element, newTarget, prefix = '', suffix = '') {
@@ -692,8 +741,11 @@ const observerOptions = {
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !entry.target.hasAttribute('data-animated')) {
             entry.target.classList.add('fade-in-up');
+            entry.target.setAttribute('data-animated', 'true');
+            // Stop observing this element since we only want to animate it once
+            observer.unobserve(entry.target);
         }
     });
 }, observerOptions);
