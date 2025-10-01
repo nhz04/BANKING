@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transactions - 404 Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <span>404 FINANCE</span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="{% if active_page == 'dashboard' %}active{% endif %}">
+                    <i class="ri-dashboard-fill"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('accounts_page') }}" class="{% if active_page == 'accounts' %}active{% endif %}">
+                    <i class="ri-account-circle-fill"></i> Accounts
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('transactions_page') }}" class="{% if active_page == 'transactions' %}active{% endif %}">
+                    <i class="ri-arrow-left-right-fill"></i> Transactions
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+ <div class="content-dashboard">
+    <div class="transactions-header">
+        <h1>TRANSACTION MANAGEMENT</h1>
+    </div>
+
+    <!-- Manual entry form -->
+    <form id="loadTransactionsForm" action="{{ url_for('get_transactions') }}" method="get">
+        <input type="number" name="acc_no" placeholder="Enter Account Number" min="1" value="{{ acc_no or '' }}" required>
+        <button type="submit" class="btn-load-transactions">
+            <i class="ri-search-line"></i> Load Transactions
+        </button>
+    </form>
+
+    {% if transactions %}
+    <div class="transactions-table-container">
+        <table class="transactions-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                    <th>Transaction ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.date }}</td>
+                    <td>{{ t.type }}</td>
+                    <td>{{ t.amount }}</td>
+                    <td>{{ t.balance }}</td>
+                    <td>{{ t.txn_id }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No transactions found or please enter account number.</p>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

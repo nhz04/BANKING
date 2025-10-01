@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 Finance</title>
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Remix Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+
+
+    <!--=================== NAVIGATION  ===================-->
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <span>404 FINANCE</span>
+        </div>
+     <ul class="nav-links">
+    <li>
+
+    <a href="{{ url_for('dashboard') }}" class="{% if active_page == 'dashboard' %}active{% endif %}">
+        <i class="ri-dashboard-fill"></i> Dashboard
+    </a>
+    </li>
+    <li>
+        <a href="{{ url_for('accounts_page') }}" class="{% if active_page == 'accounts' %}active{% endif %}">
+            <i class="ri-account-circle-fill"></i> Accounts
+        </a>
+    </li>
+    <li>
+        <a href="{{ url_for('transactions_page') }}" class="{% if active_page == 'transactions' %}active{% endif %}">
+            <i class="ri-arrow-left-right-fill"></i> Transactions
+        </a>
+
+
+    </li>
+</ul>
+
+    </nav>
+
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!--=================== DASHBOARD CONTENT  ===================-->
+
+
+  
+    <div class="content-dashboard">
+        <h1>DASHBOARD</h1>
+        <p>Welcome to 404 Finance - Your money, your way</p>
+
+        <!-- Info Cards -->
+        <div class="cards-container">
+            <div class="card">
+                <img src="{{ url_for('static', filename='users.png') }}" alt="Total Accounts" class="card-icon">
+                <h2>Total Accounts</h2>
+                <p class="card-value">{{ total_accounts }}</p>
+            </div>
+            <div class="card">
+                <img src="{{ url_for('static', filename='peso.png') }}" alt="Total Balance" class="card-icon">
+                <h2>Total Balance</h2>
+                <p class="card-value">₱{{ total_balance }}</p>
+            </div>
+            <div class="card">
+                <img src="{{ url_for('static', filename='deposit.png') }}" alt="Total Deposit" class="card-icon">
+                <h2>Total Deposit</h2>
+                <p class="card-value">₱{{ total_deposit }}</p>
+            </div>
+            <div class="card">
+                <img src="{{ url_for('static', filename='withdraw.png') }}" alt="Total Withdrawal" class="card-icon">
+                <h2>Total Withdrawal</h2>
+                <p class="card-value">₱{{ total_withdrawal }}</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+
+
+        <div class="quick-actions-box">
+            <h3 class="quick-actions-title"><i class="ri-flashlight-line"></i> QUICK ACTIONS</h3>
+            <div class="quick-actions">
+                <button class="action-btn create-account" onclick="openModal('createAccountModal')">
+                    <i class="ri-user-add-line"></i> Create Account
+                </button>
+                <button class="action-btn deposit" onclick="openModal('depositModal')">
+                    <i class="ri-add-line"></i> Deposit
+                </button>
+                <button class="action-btn withdrawal" onclick="openModal('withdrawModal')">
+                    <i class="ri-subtract-line"></i> Withdrawal
+                </button>
+                <button class="action-btn check-balance" onclick="openModal('checkBalanceModal')">
+                    <i class="ri-search-line"></i> Check Balance
+                </button>
+            </div>
+        </div>
+
+
+
+
+
+    <!-- Modals -->
+
+
+    <div id="createAccountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createAccountModal')">&times;</span>
+            <h2>Create Account</h2>
+            <form action="{{ url_for('create_account') }}" method="POST">
+            <label>Account Number (6 digits):</label>
+            <input type="number" name="acc_no" min="0" maxlength="6" required>
+            <label>Account Holder Name:</label>
+            <input type="text" name="name" required>
+            <label>Initial Balance:</label>
+            <input type="number" step="0.01" name="balance" min="0" required>
+            <button type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+
+   
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('depositModal')">&times;</span>
+            <h2>Deposit</h2>
+            <form action="{{ url_for('deposit') }}" method="POST">
+            <label>Account Number:</label>
+            <input type="number" name="acc_no" min="0" required>
+            <label>Amount:</label>
+            <input type="number" step="0.01" name="amount" min="0.01" required>
+                <button type="submit">Deposit</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('withdrawModal')">&times;</span>
+            <h2>Withdraw</h2>
+            <form action="{{ url_for('withdraw') }}" method="POST">
+                <label>Account Number:</label>
+                <input type="text" name="acc_no" required>
+                <label>Amount:</label>
+                <input type="number" step="0.01" name="amount" required>
+                <button type="submit">Withdraw</button>
+            </form>
+        </div>
+    </div>
+
+<div id="checkBalanceModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('checkBalanceModal')">&times;</span>
+    <h2>Check Balance</h2>
+    <form id="checkBalanceForm">
+    <label>Account Number:</label>
+    <input type="number" name="acc_no" min="1" step="1" required pattern="\d+">
+
+      <button type="submit">Check</button>
+    </form>
+    <p id="balanceResult"></p>
+  </div>
+</div>
+
+
+
+
+
+<script>
+    // ---------------- MODAL FUNCTIONS ----------------
+    window.openModal = function(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = "flex";
+    };
+
+    window.closeModal = function(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = "none";
+    };
+
+    // ---------------- OTHER JS ----------------
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // Flash messages auto-remove
+        const flashes = document.querySelectorAll(".flash");
+        flashes.forEach(flash => {
+            setTimeout(() => flash.remove(), 4000);
+        });
+
+        // Check balance form
+        const checkForm = document.getElementById('checkBalanceForm');
+        if (checkForm) {
+            checkForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const acc_no = this.acc_no.value;
+                const resultEl = document.getElementById('balanceResult');
+
+                try {
+                    const response = await fetch('{{ url_for("check_balance") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ acc_no })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        resultEl.textContent = `Balance for account ${data.acc_no}: ₱${data.balance.toFixed(2)}`;
+                    } else {
+                        resultEl.textContent = data.message;
+                    }
+                } catch (err) {
+                    resultEl.textContent = 'Error fetching balance.';
+                    console.error(err);
+                }
+            });
+        }
+    });
+</script>
+
+
+
+
+</body>
+</html>
