@@ -17,20 +17,32 @@
     font-family: 'Poppins', sans-serif;
 }
 
+.navbar a.active {
+  color: #333333;
+  border-bottom: 3px solid #BBDEFB;
+  border-radius: 0; /* keeps it clean */
+  background: none;
+}
+
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-left: 30px;
+    
 }
+
+
 .logo img {
-    height: 40px;
+    height: 50px;   /* adjust */
+    width: auto;
+    
 }
 .logo span {
     font-size: 20px;
     font-weight: bold;
-    color: #B72E2E;
+    color: #333333;
 }
 
 
@@ -45,20 +57,35 @@
     text-decoration: none;
     font-size: 16px;
     color: #747171;              
-    font-weight: 500;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 5px;
     padding: 8px 15px;          
     border-radius: 20px;        
     transition: all 0.3s ease;  
+     letter-spacing: 0.3px;
 }
+
+.nav-links li a::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #333333;
+    transition: width 0.3s;
+    margin-top: 4px;
+}
+.nav-links li a:hover::after {
+    width: 100%;
+}
+
 
 .nav-links li a:hover,
 .nav-links li a:focus,
 .nav-links li a.active {        
-    color: #B72E2E;                
-    background-color: #f3b4b4;   
+    color: #333333;                
+    background-color: #e4e8f6;   
     border-radius: 20px;
 }
 
@@ -69,8 +96,8 @@
 
 .content-dashboard {
     padding: 40px;
-    background: linear-gradient(135deg, #B72E2E, #FF5A5A);
-    color: #fff;
+    background: linear-gradient(135deg, #BBDEFB, #1976D2);
+    color: #333333;
     min-height: calc(100vh - 70px); 
     font-family: 'Poppins', sans-serif;
     text-align: center;
@@ -102,10 +129,19 @@
 }
 
 .card-icon {
-    width: 50px;      
-    height: 50px;
-    margin-bottom: 10px;
+     width: 50px;   /* adjust size */ 
+    height: 50px;  /* keep square */ 
+    object-fit: contain;  /* keeps aspect ratio */
+    border-radius: 50%;
+    padding: 10px;
+    background: #f3f4f6; /* subtle neutral bg */
 }
+.card:nth-child(1) .card-icon { background: #e0f2fe; color: #0284c7; } /* Accounts */
+.card:nth-child(2) .card-icon { background: #dcfce7; color: #16a34a; } /* Balance */
+.card:nth-child(3) .card-icon { background: #fef9c3; color: #ca8a04; } /* Deposit */
+.card:nth-child(4) .card-icon { background: #fee2e2; color: #b91c1c; } /* Withdrawal */
+
+
 
 .card h2 {
     font-size: 18px;
@@ -116,7 +152,7 @@
 .card-value {
     font-size: 22px;
     font-weight: 700;
-    color: #B72E2E; 
+    color: #042546; 
 }
 
 
@@ -140,7 +176,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    color: #B72E2E; 
+    color: #333333; 
 }
 
 
@@ -159,7 +195,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #B72E2E;
+    color: #333333;
     justify-content: flex-start; 
 }
 
@@ -177,34 +213,18 @@
     color: #fff;
 }
 
+/* button colors */
+.create-account { background: #da3523;}
+.deposit { background: #067b5a;}
+.withdrawal { background: #dcab09;}
+.check-balance { background: #0f28ce; }
 
-.create-account {
-    background: #da3523; 
-}
-.create-account:hover {
-    background: #d9847b;
-}
+/* button hover colors */
+.create-account:hover { background: #c62828; }
+.deposit:hover { background: #065740; }
+.withdrawal:hover { background: #ca8a04; }
+.check-balance:hover { background: #1d4ed8; }
 
-.deposit {
-    background: #067b5a; 
-}
-.deposit:hover {
-    background: #79dabe;
-}
-
-.withdrawal {
-    background: #dcab09; 
-}
-.withdrawal:hover {
-    background: #e7d085;
-}
-
-.check-balance {
-    background: #0f28ce; 
-}
-.check-balance:hover {
-    background: #7171df;
-}
 
 #balanceResult {
     margin-top: 15px;
@@ -241,7 +261,7 @@
 .accounts-header h1 {
     font-size: 24px;
     font-weight: 600;
-    color: #ffffff;
+    color: #333333;
     text-align: center;
 }
 
@@ -349,7 +369,7 @@
 .transactions-header h1 {
     font-size: 28px;
     font-weight: 700;
-    color: #ffffff;
+    color: #333333;
     letter-spacing: 1px;
 }
 
@@ -399,8 +419,9 @@
 
 .transactions-table {
     width: 100%;
+    border: 1px solid #333333;
     border-collapse: collapse;
-    background-color: #2b2b3d;
+    background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -412,24 +433,24 @@
 }
 
 .transactions-table th {
-    background-color: #3c3c5c;
-    color: #fff;
+    background-color: #ffff;
+    color: #333333;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .transactions-table tr:nth-child(even) {
-    background-color: #2e2e42;
+    background-color: #fff;
 }
 
 .transactions-table tr:hover {
-    background-color: #3a3a5a;
+    background-color: #c2c2c2;
     transition: background-color 0.3s ease;
 }
 
 .transactions-table td {
-    color: #e0e0e0;
+    color: #333333;
     font-weight: 500;
 }
 
@@ -519,11 +540,11 @@
     max-width: 450px;
     position: relative;
     animation: slideUp 0.3s ease;
-    border: 2px solid #B72E2E;
+    border: 2px solid #64B5F6;
 }
 
 .modal-content h2 {
-    color: #B72E2E;
+    color: #333333;
     margin-bottom: 20px;
     text-align: center;
     font-size: 1.5rem;
@@ -573,13 +594,13 @@
 
 .modal-content input:focus {
     outline: none;
-    border-color: #B72E2E;
+    border-color: #64B5F6;
     background-color: white;
     box-shadow: 0 0 0 3px rgba(183, 46, 46, 0.1);
 }
 
 .modal-content button {
-    background-color: #B72E2E;
+    background-color: #64B5F6;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -592,7 +613,7 @@
 }
 
 .modal-content button:hover {
-    background-color: #8a2323;
+    background-color: #3b76a5;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(183, 46, 46, 0.3);
 }
