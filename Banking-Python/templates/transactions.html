@@ -36,11 +36,11 @@
 
  <div class="content-dashboard">
     <div class="transactions-header">
-        <h1>TRANSACTION MANAGEMENT</h1>
+        <h1>Transaction History</h1>
     </div>
 
     <!-- Manual entry form -->
-    <form id="loadTransactionsForm" action="{{ url_for('get_transactions') }}" method="get">
+    <form id="loadTransactionsForm" action="{{ url_for('get_transactions') }}" method="GET">
         <input type="number" name="acc_no" placeholder="Enter Account Number" min="1" value="{{ acc_no or '' }}" required>
         <button type="submit" class="btn-load-transactions">
             <i class="ri-search-line"></i> Load Transactions
@@ -48,41 +48,39 @@
     </form>
 
     {% if transactions %}
+    <h2 style="margin-top: 20px; color: white; font-weight: 500;">Showing Transactions for Account #{{ acc_no }}</h2>
     <div class="transactions-table-container">
         <table class="transactions-table">
             <thead>
                 <tr>
                     <th>Date</th>
+                    <th>Transaction ID</th>
                     <th>Type</th>
                     <th>Amount</th>
-                    <th>Balance</th>
-                    <th>Transaction ID</th>
+                    <th>Balance After Transaction</th>
                 </tr>
             </thead>
             <tbody>
                 {% for t in transactions %}
                 <tr>
                     <td>{{ t.date }}</td>
-                    <td>{{ t.type }}</td>
-                    <td>{{ t.amount }}</td>
-                    <td>{{ t.balance }}</td>
                     <td>{{ t.txn_id }}</td>
+                    <td>{{ t.type }}</td>
+                    <td>₱{{ "{:,.2f}".format(t.amount) }}</td>
+                    <td>₱{{ "{:,.2f}".format(t.balance) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% elif acc_no and not account_exists %}
+        <p style="color: #ffdddd; margin-top: 20px;">Account #{{ acc_no }} does not exist.</p>
+    {% elif acc_no %}
+        <p style="color: #eeeeee; margin-top: 20px;">No transactions found for account #{{ acc_no }}.</p>
     {% else %}
-    <p>No transactions found or please enter account number.</p>
+        <p style="color: #eeeeee; margin-top: 20px;">Please enter an account number to view its transaction history.</p>
     {% endif %}
 </div>
-
-
-
-
-
-
-
 
 
 </body>

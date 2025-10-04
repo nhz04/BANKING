@@ -37,7 +37,11 @@ def accounts_page():
 
 @app.route("/transactions")
 def transactions_page():
-    return render_template("transactions.html", active_page="transactions", transactions=transactions)
+    # Render the page without any transactions by default.
+    # The user will be prompted to enter an account number.
+    return render_template("transactions.html", 
+                           active_page="transactions", 
+                           transactions=[])
 
 
 
@@ -78,7 +82,10 @@ def create_account():
                 flash(f"Account {acc_no} created successfully!", "success")
         except ValueError:
             flash("Invalid balance amount.", "error")
-
+    
+    # Redirect to the accounts page if creating from there, otherwise dashboard
+    if 'accounts' in (request.referrer or ''):
+        return redirect(url_for('accounts_page'))
     return redirect(request.referrer or url_for('dashboard'))
 
 
@@ -96,7 +103,10 @@ def deposit():
                 flash("Deposit must be positive.", "error")
             else:
                 accounts[acc_no]["balance"] += amount
-                transactions.append({"acc_no": acc_no, "type": "deposit", "amount": amount})
+                transactions.append({
+                    "acc_no": acc_no, "type": "deposit", "amount": amount,
+                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                })
                 flash(f"Deposited ₱{amount:.2f} into {acc_no}.", "success")
         except ValueError:
             flash("Invalid deposit amount.", "error")
@@ -119,7 +129,10 @@ def withdraw():
                 flash("Insufficient funds.", "error")
             else:
                 accounts[acc_no]["balance"] -= amount
-                transactions.append({"acc_no": acc_no, "type": "withdraw", "amount": amount})
+                transactions.append({
+                    "acc_no": acc_no, "type": "withdraw", "amount": amount,
+                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                })
                 flash(f"Withdrew ₱{amount:.2f} from {acc_no}.", "success")
         except ValueError:
             flash("Invalid withdrawal amount.", "error")
@@ -160,24 +173,37 @@ def delete_account(acc_no):
 @app.route("/get_transactions")
 def get_transactions():
     acc_no = request.args.get("acc_no")  # Get from URL query
-    acc_transactions = []
+    account_transactions = []
+    account_exists = acc_no in accounts
 
-    if acc_no in accounts:
-        acc_transactions = [
-            {
-                "date": t.get("date", datetime.now().strftime("%Y-%m-%d")),
+    if account_exists:
+        # Filter transactions for the specific account and sort them by date
+        filtered_txns = sorted(
+            [t for t in transactions if t.get("acc_no") == acc_no],
+            key=lambda t: t.get("date", "")
+        )
+
+        # Calculate running balance
+        running_balance = 0
+        for idx, t in enumerate(filtered_txns):
+            if t['type'] == 'deposit':
+                running_balance += t['amount']
+            elif t['type'] == 'withdraw':
+                running_balance -= t['amount']
+            
+            account_transactions.append({
+                "date": t.get("date", "N/A"),
                 "type": t["type"].capitalize(),
                 "amount": t["amount"],
-                "balance": accounts[acc_no]["balance"],  
-                "txn_id": t.get("txn_id", f"TXN{idx+1:03}")  
-            }
-            for idx, t in enumerate(transactions) if t["acc_no"] == acc_no
-        ]
+                "balance": running_balance,
+                "txn_id": f"TXN{idx+1:04d}"
+            })
 
     return render_template(
         "transactions.html", 
         acc_no=acc_no, 
-        transactions=acc_transactions
+        transactions=account_transactions,
+        account_exists=account_exists
     )
 
 
